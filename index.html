@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>РОР · Лабораторный расчёт</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0b1120;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 255, 170, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(0, 150, 255, 0.05) 0%, transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
+            font-family: 'Inter', system-ui, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #e2e8f0;
+        }
+
+        .app-container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 
+                        0 0 20px rgba(56, 189, 248, 0.1) inset;
+            padding: 32px 36px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Декоративная колба на фоне */
+        .app-container::before {
+            content: "⚗️";
+            position: absolute;
+            top: -40px;
+            right: -20px;
+            font-size: 200px;
+            opacity: 0.03;
+            transform: rotate(15deg);
+            pointer-events: none;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 20px 0;
+            border-bottom: 2px solid rgba(56, 189, 248, 0.3);
+            padding-bottom: 16px;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+        }
+        
+        h1 span {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            text-shadow: none;
+            margin-left: auto;
+            letter-spacing: 0.5px;
+        }
+
+        .card h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #f8fafc;
+            margin: 0 0 20px 0;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card h2 .badge {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(56, 189, 248, 0.2));
+            color: #34d399;
+            padding: 5px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            font-weight: 600;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            color: #94a3b8;
+            font-weight: 500;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+            color: #cbd5e1;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(56, 189, 248, 0.05);
+            transition: background 0.2s;
+        }
+
+        .result-value {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 700;
+            color: #7dd3fc;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px 14px;
+            border-radius: 8px;
+            display: inline-block;
+            min-width: 120px;
+            text-align: right;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) inset;
+            font-size: 1.05rem;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .inline-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .small-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        /* Стилизация числового поля ввода со стрелками */
+        .num-input-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(52, 211, 153, 0.4);
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(52, 211, 153, 0.05);
+            transition: 0.2s;
+        }
+
+        .num-input-wrapper:focus-within {
+            border-color: #34d399;
+            box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15), 0 0 20px rgba(52, 211, 153, 0.2);
+        }
+
+        .num-input {
+            width: 70px;
+            padding: 10px 4px 10px 14px;
+            border: none;
+            background: transparent;
+            font-size: 1.1rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 700;
+            color: #34d399;
+            text-align: right;
+            outline: none;
+        }
+
+        /* Убираем стандартные стрелки, так как используем свои */
+        .num-input::-webkit-outer-spin-button,
+        .num-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .num-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* Свои стрелки (плюс/минус) */
+        .spin-controls {
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid rgba(52, 211, 153, 0.2);
+            margin-right: 4px;
+        }
+
+        .spin-btn {
+            background: transparent;
+            border: none;
+            color: #34d399;
+            width: 26px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.15s;
+            user-select: none;
+        }
+
+        .spin-btn:hover {
+            background: rgba(52, 211, 153, 0.15);
+            color: #6ee7b7;
+        }
+
+        .spin-btn:active {
+            background: rgba(52, 211, 153, 0.3);
+        }
+
+        .spin-btn:first-child {
+            border-radius: 0 6px 0 0;
+        }
+
+        .spin-btn:last-child {
+            border-radius: 0 0 6px 0;
+        }
+
+        .bottom-panel {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.15);
+        }
+
+        .bottom-panel .flex-between {
+            padding: 10px 0;
+        }
+
+        .bottom-panel .flex-between:not(:last-child) {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        @media (max-width: 800px) {
+            .app-container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            h1 span {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <h1>
+        🧪 РОР · Лабораторный расчёт
+        <span>Powered by Yamada</span>
+    </h1>
+
+    <div class="card">
+        <h2>
+            Требуемые реактивы
+            <div class="badge">Авторасчёт</div>
+        </h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">#</th>
+                        <th>Компонент</th>
+                        <th style="width: 180px;">Требуемое кол-во</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>H₂O <span style="color:#64748b; font-size:0.8rem; margin-left:6px;">(Вода)</span></td>
+                        <td><span class="result-value" id="reqH2ODisplay">0.000</span> <span style="color:#64748b; font-size:0.9rem;">ml</span></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>ЗОР <span style="color:#64748b; font-size:0.8rem; margin-left:6px;">(Затравка)</span></td>
+                        <td><span class="result-value" id="reqZORDisplay">0.000</span> <span style="color:#64748b; font-size:0.9rem;">ml</span></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>NaOH <span style="color:#64748b; font-size:0.8rem; margin-left:6px;">(Гидроксид натрия)</span></td>
+                        <td><span class="result-value" id="reqNaOHDisplay">0.000</span> <span style="color:#64748b; font-size:0.9rem;">ml</span></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Трилон Б <span style="color:#64748b; font-size:0.8rem; margin-left:6px;">(ЭДТА)</span></td>
+                        <td><span class="result-value" id="reqTrilonDisplay">0.000</span> <span style="color:#64748b; font-size:0.9rem;">gr</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Блок с общим объёмом и количеством образцов -->
+        <div class="bottom-panel">
+            <div class="flex-between">
+                <span class="small-label">Общий объём раствора РОР</span>
+                <span class="result-value" id="totalVolumeDisplay" style="color:#34d399; border-color:rgba(52,211,153,0.3);">3431.00 ml</span>
+            </div>
+            <div class="flex-between" style="margin-top: 10px;">
+                <span class="small-label">Кол-во образцов для исследования</span>
+                <div class="inline-group">
+                    <div class="num-input-wrapper">
+                        <input type="number" id="sampleCountInput" class="num-input" value="61" step="1" min="0">
+                        <div class="spin-controls">
+                            <button type="button" class="spin-btn" id="btnUp" tabindex="-1">▲</button>
+                            <button type="button" class="spin-btn" id="btnDown" tabindex="-1">▼</button>
+                        </div>
+                    </div>
+                    <span style="color:#64748b; font-size:0.85rem;">шт.</span>
+                </div>
+            </div>
+            <div class="flex-between" style="margin-top: 10px;">
+                <span class="small-label">Общее кол-во образцов (O1)</span>
+                <span class="result-value" id="totalSamplesDisplay">73</span>
+            </div>
+            <div class="flex-between" style="margin-top: 10px;">
+                <span class="small-label">Кол-во порций по 470 мл</span>
+                <span class="result-value" id="timesDisplay">7.30</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Фиксированные базовые значения на один рецепт (470 мл)
+        const BASE = {
+            h2o: 410,
+            zor: 50,
+            trilon: 0.94,
+            naoh: 10
+        };
+
+        // DOM элементы
+        const sampleCountInput = document.getElementById('sampleCountInput');
+        const btnUp = document.getElementById('btnUp');
+        const btnDown = document.getElementById('btnDown');
+
+        // Поля вывода
+        const totalVolumeDisplay = document.getElementById('totalVolumeDisplay');
+        const totalSamplesDisplay = document.getElementById('totalSamplesDisplay');
+        const timesDisplay = document.getElementById('timesDisplay');
+
+        const reqH2ODisplay = document.getElementById('reqH2ODisplay');
+        const reqZORDisplay = document.getElementById('reqZORDisplay');
+        const reqNaOHDisplay = document.getElementById('reqNaOHDisplay');
+        const reqTrilonDisplay = document.getElementById('reqTrilonDisplay');
+
+        function getNumber(input, defaultValue = 0) {
+            const val = parseFloat(input.value);
+            return isNaN(val) ? defaultValue : val;
+        }
+
+        function calculate() {
+            // Базовые значения на один рецепт (470 мл)
+            const h2o = BASE.h2o;
+            const zor = BASE.zor;
+            const trilon = BASE.trilon;
+            const naoh = BASE.naoh;
+
+            // Количество образцов для исследования (O3)
+            let sampleCount = getNumber(sampleCountInput, 61);
+            if (sampleCount < 0) sampleCount = 0;
+
+            // 1. Общее кол-во образцов (O1) = 8 + O3 + 4
+            const o1 = 8 + sampleCount + 4;
+
+            // 2. Общий объём РОР (O2) = O1 * 47
+            const o2 = o1 * 47;
+
+            // 3. Кол-во раз по 470 мл (K3) = O2 / 470
+            const k3 = o2 / 470; 
+
+            // 4. Требуемые количества = базовое * K3
+            const reqH2O = h2o * k3;
+            const reqZOR = zor * k3;
+            const reqNaOH = naoh * k3;
+            const reqTrilon = trilon * k3;
+
+            // --- ОБНОВЛЕНИЕ UI ---
+            totalVolumeDisplay.textContent = o2.toFixed(2) + ' ml';
+            totalSamplesDisplay.textContent = o1;
+            timesDisplay.textContent = k3.toFixed(2);
+
+            // Выводим требуемые количества с тремя знаками после запятой
+            reqH2ODisplay.textContent = reqH2O.toFixed(3);
+            reqZORDisplay.textContent = reqZOR.toFixed(3);
+            reqNaOHDisplay.textContent = reqNaOH.toFixed(3);
+            reqTrilonDisplay.textContent = reqTrilon.toFixed(3);
+        }
+
+        function attachListeners() {
+            sampleCountInput.addEventListener('input', calculate);
+            sampleCountInput.addEventListener('change', calculate);
+
+            // Кастомные кнопки плюс/минус
+            btnUp.addEventListener('click', () => {
+                let val = getNumber(sampleCountInput, 0);
+                sampleCountInput.value = val + 1;
+                calculate();
+            });
+
+            btnDown.addEventListener('click', () => {
+                let val = getNumber(sampleCountInput, 0);
+                if (val > 0) {
+                    sampleCountInput.value = val - 1;
+                    calculate();
+                }
+            });
+        }
+
+        function init() {
+            attachListeners();
+            calculate();
+        }
+
+        init();
+    })();
+</script>
+</body>
+</html>
